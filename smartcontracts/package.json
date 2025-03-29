@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deployCoin": "npx hardhat ignition deploy ./ignition/modules/TCOIN.ts --network buildbear",
+    "deployBatchCallAndSponsor": "npx hardhat ignition deploy ./ignition/modules/BatchCallAndSponsor.ts --network buildbear"
   },
   "keywords": [],
   "author": "",
