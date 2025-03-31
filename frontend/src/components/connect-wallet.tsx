@@ -35,7 +35,11 @@ export default function ConnectWallet() {
       <Modal id={modalId}>
         <div className="flex flex-col gap-2">
           <h2 className="text-xl font-bold">Connect Wallet</h2>
-          <p>Only local accounts (private key, mnemonic, etc.) and not JSON-RPC accounts (metamask, etc.) are supported for signing EIP-7702 Authorizations.</p>
+          <p>
+            Only local accounts (private key, mnemonic, etc.) and not JSON-RPC
+            accounts (metamask, etc.) are supported for signing EIP-7702
+            Authorizations.
+          </p>
           <a
             href="https://viem.sh/docs/eip7702/signAuthorization"
             target="_blank"
@@ -43,10 +47,7 @@ export default function ConnectWallet() {
           >
             More information
           </a>
-          <form
-            onSubmit={handleConnectWallet}
-            className="flex flex-col gap-4"
-          >
+          <form onSubmit={handleConnectWallet} className="flex flex-col gap-4">
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Mnemonic Phrase</legend>
               <input
@@ -92,10 +93,7 @@ function WalletInfo() {
         <code>{formattedAddress}</code>
       </div>
       <p className="font-bold">{balance} BBETH</p>
-      <button
-        onClick={disconnectWallet}
-        className="btn btn-accent"
-      >
+      <button onClick={disconnectWallet} className="btn btn-accent">
         Disconnect
       </button>
     </div>

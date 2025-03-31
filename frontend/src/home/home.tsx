@@ -1,5 +1,6 @@
 import { TCOINAbi, TCOINAddress } from "../viem/contractData";
 import { useViem } from "../contexts/viem-context";
+import { Link } from "react-router";
 
 export default function Home() {
   const { walletClient } = useViem();
@@ -40,6 +41,9 @@ export default function Home() {
       <button className="btn btn-primary" onClick={try7702Transaction}>
         Try 7702 Transaction
       </button>
+      <Link to="/batch" className="btn btn-info">
+        Go to Batching
+      </Link>
     </div>
   );
 }
