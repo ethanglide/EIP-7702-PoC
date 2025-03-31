@@ -1,6 +1,6 @@
 import { defineChain } from "viem";
 
-const buildbearRpcUrl = "https://rpc.buildbear.io/novel-vision-8fd2617a";
+export const buildbearRpcUrl = "https://rpc.buildbear.io/novel-vision-8fd2617a";
 const buildbearExplorerUrl =
   "https://explorer.buildbear.io/novel-vision-8fd2617a";
 
