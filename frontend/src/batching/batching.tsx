@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
+import { useViem } from "../contexts/viem-context";
+import { BatchCallAndSponsorAbi, BatchCallAndSponsorAddress } from "../viem/contractData";
+import { encodeFunctionData, Abi } from "viem";
+import { initializeWalletClient } from "../viem/viem";
 
 const argTypes = ["address", "bool", "bytes", "string", "uint256"];
 
@@ -17,6 +21,7 @@ interface Call {
 }
 
 export default function Batching() {
+  const { walletClient } = useViem();
   const [calls, setCalls] = useState<Call[]>([]);
   const [sponsorMnemonic, setSponsorMnemonic] = useState<string>("");
 
@@ -40,18 +45,74 @@ export default function Batching() {
     setCalls([...calls, { to: "", value: 0, functionName: "", args: [] }]);
   }
 
+  async function executeBatch() {
+    if (!walletClient) {
+      return;
+    }
+
+    console.log("Executing batch call with calls:", calls);
+
+    const callAbis = calls.map((call) => ([{
+      type: "function",
+      name: call.functionName,
+      inputs: call.args.map((arg) => ({ name: arg.name, type: arg.type })),
+    }])) as unknown as Abi[];
+
+    console.log("Call ABIs:", callAbis);
+
+    const callData = calls.map((call, index) => {
+      const abi = callAbis[index];
+      const args = call.args.map((arg) => arg.value);
+      return encodeFunctionData({ abi, functionName: call.functionName, args });
+    });
+
+    console.log("Call data:", callData);
+
+    const sponsorWalletClient = sponsorMnemonic !== "" ? initializeWalletClient(sponsorMnemonic) : null;
+
+    // Use sponsor wallet if available, otherwise use the main wallet
+    const wallet = sponsorWalletClient || walletClient;
+
+    // Set executor to "self" if not using sponsor, otherwise don't
+    // set executor and use the account field
+    const authorization = await walletClient.signAuthorization({
+      contractAddress: BatchCallAndSponsorAddress,
+      executor: sponsorWalletClient ? undefined : "self",
+      account: sponsorWalletClient ? walletClient.account : undefined,
+    });
+
+    const hash = await wallet.sendTransaction({
+      authorizationList: [authorization],
+      to: walletClient.account.address,
+      data: encodeFunctionData({
+        abi: BatchCallAndSponsorAbi,
+        functionName: "execute",
+        args: [
+          calls.map((call, index) => ({
+            to: call.to as `0x${string}`,
+            value: BigInt(call.value),
+            data: callData[index],
+          })),
+        ],
+      })
+    });
+
+    console.log("Batch call executed with hash:", hash);
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <h2 className="text-2xl font-bold">Batch Calls and Sponsors</h2>
-      <p>Insert some explanation about batch calls and sponsors here.</p>
+      <p>EIP-7702 enables EOAs to make multiple smart contract calls within a single transaction. By setting your EOA account code to use our "BatchCallAndSponsor" smart contract which takes a list of calls and makes them, the calls can be sent directly from your EOA.</p>
+      <p>If you set your EOA account code to the "BatchCallAndSponsor" smart contract and get someone else to make the transaction for you, they can pay the gas fees for the transaction though the calls will be made from your account. This is the "sponsor" system.</p>
       <h3 className="text-xl font-bold">Sponsor (Optional)</h3>
       <fieldset className="fieldset">
         <legend className="fieldset-legend">Sponsor Mnemonic</legend>
         <input
-          type="text"
+          type="password"
           value={sponsorMnemonic}
           onChange={(e) => setSponsorMnemonic(e.target.value)}
-          className="input"
+          className="input w-full"
           placeholder="Sponsor Mnemonic"
         />
       </fieldset>
@@ -66,7 +127,7 @@ export default function Batching() {
           </button>
         </div>
       </div>
-      <ul className="list max-h-[35rem] overflow-y-auto overflow-x-hidden bg-base-200 rounded-xl shadow-lg">
+      <ul className="list max-h-[27rem] overflow-y-auto overflow-x-hidden bg-base-200 rounded-xl shadow-lg">
         {calls.map((call, index) => (
           <CallForm
             key={index}
@@ -76,6 +137,15 @@ export default function Batching() {
           />
         ))}
       </ul>
+      <div className="flex justify-center">
+        <button
+          onClick={executeBatch}
+          className="btn btn-primary"
+          disabled={calls.length === 0}
+        >
+          Execute Batch
+        </button>
+      </div>
     </div>
   );
 }
@@ -123,7 +193,7 @@ function CallForm({
                 type="text"
                 value={call.to}
                 onChange={(e) => setCall({ ...call, to: e.target.value })}
-                className="input"
+                className="input w-md"
                 placeholder="To address"
               />
             </fieldset>
@@ -215,7 +285,7 @@ function ArgForm({
             onChange={(e) => setArg({ ...arg, type: e.target.value })}
             className="input input-sm"
           >
-            <option disabled selected value="">
+            <option disabled value="">
               Arg Type
             </option>
             {argTypes.map((type) => (

@@ -1,6 +1,7 @@
 import { TCOINAbi, TCOINAddress } from "../viem/contractData";
 import { useViem } from "../contexts/viem-context";
 import { Link } from "react-router";
+import Batching from "../batching/batching";
 
 export default function Home() {
   const { walletClient } = useViem();
@@ -36,14 +37,8 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      Home Page
-      <button className="btn btn-primary" onClick={try7702Transaction}>
-        Try 7702 Transaction
-      </button>
-      <Link to="/batch" className="btn btn-info">
-        Go to Batching
-      </Link>
+    <div>
+      <Batching />
     </div>
   );
 }
