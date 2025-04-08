@@ -1,4 +1,7 @@
 // SPDX-License-Identifier: MIT
+// quiknode demo:
+// https://github.com/quiknode-labs/qn-guide-examples/blob/main/ethereum/eip-7702/src/BatchCallAndSponsor.sol
+// https://www.quicknode.com/guides/ethereum-development/smart-contracts/eip-7702-smart-accounts
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
