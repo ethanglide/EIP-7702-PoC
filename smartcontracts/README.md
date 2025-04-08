@@ -1,6 +1,10 @@
 ## Backend Demo
 
-### Start Local Node
+### Install Foundry
+
+https://book.getfoundry.sh/getting-started/installation
+
+### Start Local Anvil Node
 
 Navigate to smartcontracts directory
 
@@ -16,7 +20,7 @@ anvil --hardfork prague
 
 ### Run Demo Script
 
-Navigate to smartcontracts directory
+In a different termial, navigate to smartcontracts directory
 
 ```
 cd smartcontracts
