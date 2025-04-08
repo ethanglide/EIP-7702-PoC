@@ -4,11 +4,15 @@
 
 ### Frontend
 
+The frontend is not functional as the connection with the local foundry node was not able to be configured in time. But the proof of concept with all code is there.
+
 ```sh
 # in /frontend
 npm install
 npm run dev
 ```
+
+The frontend will be accessible at http://localhost:5173
 
 ### Backend
 
